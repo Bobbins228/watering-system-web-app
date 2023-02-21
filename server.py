@@ -13,7 +13,7 @@ import os
 import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, db
-
+import pymongo
 
 load_dotenv(".env")
 
@@ -76,8 +76,17 @@ regAuth = firebase.auth()
 isAuthenticated = False
 isAdmin = False
 
+#Connect to Mongo Atlas and set the database to plant-profile and collection to profile
+client = pymongo.MongoClient(os.getenv("MONGO_STRING"))
+mongoDb = client["plant-profile"]
+collection = mongoDb["profile"]
+
+
+# Find a specific profile in the collection and sets it to the profile variable
+profile = collection.find_one({"_id": 1})
+
 # Home page
-@application.route("/")
+@application.route("/home")
 def home():
     # Get the Firebase ID token from the user's browser cookies.
     id_token = request.cookies.get('token')
@@ -130,7 +139,7 @@ def signup():
         return render_template("signup.html")
 
 # Login page
-@application.route("/login", methods=["GET", "POST"])
+@application.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         # If the form was submitted, authenticate the user with the provided email and password
@@ -144,7 +153,7 @@ def login():
             response.set_cookie('token', session_cookie, httponly=True, secure=True)
             ref = db.reference("/users/"+user['localId']+"/")
             adminStatus = ref.child("isAdmin").get()
-            print(adminStatus)
+        
             global isAuthenticated
             isAuthenticated = True
             global isAdmin
@@ -162,20 +171,43 @@ def login():
         return render_template("login.html")
 
 # plant profile route
-@application.route('/plant-profile')
+@application.route('/plant-profile', methods=["GET", "POST"])
 def profile():
     global isAuthenticated
     global isAdmin
-    print(isAdmin)
     if isAuthenticated == True:
         if isAdmin == True:
-            return render_template("plant-profile.html")
+            if request.method == "POST":
+                    inputName = request.form["name"]
+                    inputWateringType = request.form["watering-type"]
+                    try:
+                        myquery = { "_id": 1 }
+                        newvalues = { "$set": { "name": inputName, "watering-type": inputWateringType } }
+                        collection.update_one(myquery, newvalues)
+                        return render_template("plant-profile.html")
+                    except Exception as e:
+                        print(e)
+            wateringType = collection.find_one({"_id": 1})["watering-type"]
+            name = collection.find_one({"_id": 1})["name"]
+            dateWatered = collection.find_one({"_id": 1})["date-last-watered"]
+            message = {
+                "name": name,
+                "wateringType": wateringType,
+                "dateWatered": dateWatered
+            }
+            return render_template("plant-profile.html", message=message)
+        
+            
+            
         else:
             message = "No admin access detected, try a different account."
             return render_template("login.html",message=message)
+
     else:
         message = "Please log in as an administrator to view this page."
         return render_template("login.html",message=message)
+    
+    
 
 
 # Logout route
