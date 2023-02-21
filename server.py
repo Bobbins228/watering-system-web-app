@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 import os
 import firebase_admin
 import pyrebase
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, db
 
 
 load_dotenv(".env")
@@ -66,12 +66,15 @@ application = Flask(__name__)
 # Initialize Firebase app
 firebase = pyrebase.initialize_app(config)
 cred = credentials.Certificate('firebase-credentials.json')
-firebaseAdmin = firebase_admin.initialize_app(cred)
+firebaseAdmin = firebase_admin.initialize_app(cred, {
+	'databaseURL':"https://watering-web-app-default-rtdb.europe-west1.firebasedatabase.app"
+	})
 
 # Get a reference to the Firebase Authentication service
 regAuth = firebase.auth()
 
 isAuthenticated = False
+isAdmin = False
 
 # Home page
 @application.route("/")
@@ -97,6 +100,9 @@ def home():
             except auth.InvalidIdTokenError:
                 # The token is invalid or expired. Redirect the user to the login page.
                 return redirect(url_for('login'))
+    else:
+        message = "Please log in to view this page."
+        return render_template("login.html",message=message)
     
     # If there's no ID token, redirect the user to the login page.
     return redirect(url_for('login'))
@@ -108,8 +114,11 @@ def signup():
         # If the form was submitted, create a new user with the email and password
         email = request.form["email"]
         password = request.form["password"]
+        userName = request.form["userName"]
         try:
-            regAuth.create_user_with_email_and_password(email, password)
+            user = regAuth.create_user_with_email_and_password(email, password)
+            collectionRef = db.reference("users/"+user["localId"])
+            collectionRef.set({"email": email, "name": userName, "isAdmin": False})
             # If the user was created successfully, redirect to the login page
             return redirect(url_for('login'))
         except:
@@ -133,9 +142,13 @@ def login():
             session_cookie = auth.create_session_cookie(user['idToken'], expires_in=36000)
             response = redirect(url_for('home'))
             response.set_cookie('token', session_cookie, httponly=True, secure=True)
+            ref = db.reference("/users/"+user['localId']+"/")
+            adminStatus = ref.child("isAdmin").get()
+            print(adminStatus)
             global isAuthenticated
             isAuthenticated = True
-            print(isAuthenticated)
+            global isAdmin
+            isAdmin = adminStatus
             return response
         except Exception as e:
             print(e)
@@ -148,6 +161,23 @@ def login():
         # If the user has not submitted the form, render the login page
         return render_template("login.html")
 
+# plant profile route
+@application.route('/plant-profile')
+def profile():
+    global isAuthenticated
+    global isAdmin
+    print(isAdmin)
+    if isAuthenticated == True:
+        if isAdmin == True:
+            return render_template("plant-profile.html")
+        else:
+            message = "No admin access detected, try a different account."
+            return render_template("login.html",message=message)
+    else:
+        message = "Please log in as an administrator to view this page."
+        return render_template("login.html",message=message)
+
+
 # Logout route
 @application.route('/logout')
 def logout():
@@ -155,7 +185,9 @@ def logout():
     response = redirect(url_for('login'))
     response.set_cookie('session', expires=0)
     global isAuthenticated
+    global isAdmin
     isAuthenticated = False
+    isAdmin = False
     return response
 
 def plot_temperature_data() -> Iterator[str]:
@@ -236,5 +268,5 @@ def chart_humidity_data() -> Response:
     return response
 
 
-if __name__ == "__main__":
-    application.run(host="0.0.0.0", threaded=True)
+if __name__ == '__main__':
+    application.run(debug=True)
