@@ -1,0 +1,73 @@
+.login {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login__container {
+display: flex;
+flex-direction: column;
+text-align: center;
+background-color: #dcdcdc;
+padding: 30px;
+font-style: normal;
+}
+.login__textBox {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.login__btn {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.login__btn:hover{
+  background-color: #45a049;
+}
+.label{
+  float: left;
+  font-size: 1.5em;
+  text-align: left;
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #5A524C;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.title {
+  font-weight: bold;
+  size: 2em;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #111;
+}
+.active {
+  background-color: #407299;
+}

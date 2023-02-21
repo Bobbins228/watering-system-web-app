@@ -2,20 +2,33 @@
 <html>
 <head>
   <title>Login</title>
+  <link rel="stylesheet" href="../static/css/css123.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.1/css/bootstrap.min.css"
+  integrity="sha512-T584yQ/tdRR5QwOpfvDfVQUidzfgc2339Lc8uBDtcp/wYu80d7jwBgAxbyMh0a9YM9F8N3tdErpFI8iaGx6x5g=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
 <body>
-  <h1>Login</h1>
-  {% if message %}
-    <p class="error">{{ message }}</p>
-  {% endif %}
-  <form method="post" action="{{ url_for('login') }}">
-    <label for="email">Email</label>
-    <input type="email" name="email" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" required>
-    <input type="submit" value="Login">
-  </form>
-  <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
-  <p><a href="{{url_for('home')}}">Home</a></p>
+    <ul>
+        <li><a href="{{url_for('home')}}">Home</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+        <li><a href="{{ url_for('login') }}">Log In</a></li>
+        <li style="float:right"><a class="active" href="{{ url_for('logout') }}">Log Out</a></li>
+    </ul> 
+    <div class="login">
+        <div class="login__container">
+            <h2>Login</h2>
+            {% if message %}
+                <p class="error">{{ message }}</p>
+            {% endif %}
+            <form method="post" action="{{ url_for('login') }}">
+                <label class="label" for="email">Email</label>
+                <input type="email" class="login__textBox" name="email" required>
+                <label class="label" for="password">Password</label>
+                <input type="password" name="password" class="login__textBox" required>
+                <input type="submit" class="login__btn" value="Log In">
+            </form>
+            <p>Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a></p>
+        </div>
+    </div>
 </body>
 </html>

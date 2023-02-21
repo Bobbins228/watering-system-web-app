@@ -4,6 +4,7 @@
     <style>
         h1 {text-align: center;}
     </style>
+    <link rel="stylesheet" href="../static/css/css123.css">
     <meta charset="UTF-8">
     <title>Automated Watering System graphed metrics</title>
     <!--suppress JSUnresolvedLibraryURL -->
@@ -15,9 +16,14 @@
           integrity="sha512-/zs32ZEJh+/EO2N1b0PEdoA10JkdC3zJ8L5FTiQu82LR9S/rOQNfQN7U59U9BC12swNeRAz3HSzIL2vpp4fv3w=="
           crossorigin="anonymous" referrerpolicy="no-referrer"/>
 </head>
-<h1>Automated Watering System graphed metrics</h1>
 <body>
-    <a href="{{ url_for('logout') }}">Log Out</a>
+    <ul>
+        <li><a href="{{url_for('home')}}">Home</a></li>
+        <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+        <li><a href="{{ url_for('login') }}">Log In</a></li>
+        <li style="float:right"><a class="active" href="{{ url_for('logout') }}">Log Out</a></li>
+    </ul>
+    <h1>Automated Watering System graphed metrics</h1>
 <div class="container">
     <div class="row">
         <div class="col-12">
