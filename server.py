@@ -8,18 +8,16 @@ from typing import Iterator
 from flask import Flask, Response, render_template, request, stream_with_context, redirect, url_for
 #Kafka Consumer
 from confluent_kafka import Consumer
-from dotenv import load_dotenv
 import os
 import firebase_admin
 import pyrebase
 from firebase_admin import credentials, auth, db
 import pymongo
 
-load_dotenv(".env")
 
-bootstrap_server = os.getenv("BOOTSTRAP_SERVER")
-sasl_user_name = os.getenv("CLIENT_ID")
-sasl_password = os.getenv("CLIENT_SECRET")
+bootstrap_server = os.environ["BOOTSTRAP_SERVER"]
+sasl_user_name = os.environ["CLIENT_ID"]
+sasl_password = os.environ["CLIENT_SECRET"]
 tempConsumer = Consumer({
     'bootstrap.servers': bootstrap_server,
     'security.protocol': 'SASL_SSL',
@@ -77,7 +75,7 @@ isAuthenticated = False
 isAdmin = False
 
 #Connect to Mongo Atlas and set the database to plant-profile and collection to profile
-client = pymongo.MongoClient(os.getenv("MONGO_STRING"))
+client = pymongo.MongoClient(os.environ["MONGO_STRING"])
 mongoDb = client["plant-profile"]
 collection = mongoDb["profile"]
 
